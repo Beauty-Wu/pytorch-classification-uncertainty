@@ -8,7 +8,8 @@ from matplotlib import pyplot as plt
 from PIL import Image
 from losses import relu_evidence
 from helpers import rotate_img, one_hot_embedding, get_device
-
+#整体思路是加载一张图像，预处理后输入到深度学习模型中进行分类。根据是否启用不确定性分析，
+#代码会计算并输出预测结果、类别概率和不确定性值，并通过Matplotlib可视化结果。
 
 def test_single_image(model, img_path, uncertainty=False, device=None):
     img = Image.open(img_path).convert("L")
