@@ -3,18 +3,18 @@ import torch.nn.functional as F
 from helpers import get_device
 
 
-def relu_evidence(y):
+def relu_evidence(y):# ReLU 激活函数，确保输出是非负的。 
     return F.relu(y)
 
 
-def exp_evidence(y):
+def exp_evidence(y):# 计算指数并限制范围防止溢出。  
     return torch.exp(torch.clamp(y, -10, 10))
 
 
-def softplus_evidence(y):
+def softplus_evidence(y):# Softplus 函数，作为平滑的 ReLU 的替代。  
     return F.softplus(y)
 
-
+#计算 KL 散度，常用于衡量两个概率分布之间的差异。
 def kl_divergence(alpha, num_classes, device=None):
     if not device:
         device = get_device()
@@ -34,7 +34,7 @@ def kl_divergence(alpha, num_classes, device=None):
     kl = first_term + second_term
     return kl
 
-
+#计算对数似然损失，结果将用于评估模型的性能。
 def loglikelihood_loss(y, alpha, device=None):
     if not device:
         device = get_device()
@@ -48,7 +48,7 @@ def loglikelihood_loss(y, alpha, device=None):
     loglikelihood = loglikelihood_err + loglikelihood_var
     return loglikelihood
 
-
+#计算均方误差损失，同时结合 KL 散度。
 def mse_loss(y, alpha, epoch_num, num_classes, annealing_step, device=None):
     if not device:
         device = get_device()
@@ -65,7 +65,7 @@ def mse_loss(y, alpha, epoch_num, num_classes, annealing_step, device=None):
     kl_div = annealing_coef * kl_divergence(kl_alpha, num_classes, device=device)
     return loglikelihood + kl_div
 
-
+#计算 EDL 损失，这种损失考虑了输出证据的分布。
 def edl_loss(func, y, alpha, epoch_num, num_classes, annealing_step, device=None):
     y = y.to(device)
     alpha = alpha.to(device)
@@ -82,7 +82,7 @@ def edl_loss(func, y, alpha, epoch_num, num_classes, annealing_step, device=None
     kl_div = annealing_coef * kl_divergence(kl_alpha, num_classes, device=device)
     return A + kl_div
 
-
+#使用均方误差方式计算 EDL 损失。
 def edl_mse_loss(output, target, epoch_num, num_classes, annealing_step, device=None):
     if not device:
         device = get_device()
@@ -93,7 +93,7 @@ def edl_mse_loss(output, target, epoch_num, num_classes, annealing_step, device=
     )
     return loss
 
-
+#使用对数似然方式计算 EDL 损失。
 def edl_log_loss(output, target, epoch_num, num_classes, annealing_step, device=None):
     if not device:
         device = get_device()
@@ -106,7 +106,7 @@ def edl_log_loss(output, target, epoch_num, num_classes, annealing_step, device=
     )
     return loss
 
-
+#使用 digamma 处理方式计算 EDL 损失。
 def edl_digamma_loss(
     output, target, epoch_num, num_classes, annealing_step, device=None
 ):
